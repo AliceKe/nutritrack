@@ -56,6 +56,15 @@ def create_food():
     #     return failure_response("user not found")
 
     body = json.loads(request.data)
+    if None in (
+        body,
+        body.get("name"),
+        body.get("calories"),
+        body.get("carbs"),
+        body.get("protein"),
+        body.get("fat"),
+    ):
+        return failure_response("Missing required fields.", 400)
 
     new_food = Food(
         name=body.get("name"),
@@ -114,6 +123,7 @@ def create_user():
         weight=body.get("weight"),
         height=body.get("height"),
         goal_weight=body.get("goal_weight"),
+        daily_calorie_target=body.get("daily_calorie_target"),
     )
     db.session.add(new_user)
     db.session.commit()
@@ -132,7 +142,7 @@ def get_user_by_id(user_id):
     return success_response(user.user_serialize())
 
 
-# Update user's weight
+# Update user's weight or height
 @app.route("/api/users/<int:user_id>/", methods=["POST"])
 def update_user_info(user_id):
     """
@@ -148,6 +158,10 @@ def update_user_info(user_id):
         user.weight = body.get("weight")
     elif body.get("type") == "height":
         user.height = body.get("height")
+    elif body.get("type") == "goal_weight":
+        user.goal_weight = body.get("goal_weight")
+    elif body.get("type") == body.get("daily_calorie_target"):
+        user.daily_calorie_target = body.get("daily_calorie_target")
     db.session.commit()
     return success_response(user.user_serialize())
 
