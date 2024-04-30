@@ -142,7 +142,7 @@ def get_user_by_id(user_id):
     return success_response(user.user_serialize())
 
 
-# Update user's weight or height
+# Update user's information
 @app.route("/api/users/<int:user_id>/", methods=["POST"])
 def update_user_info(user_id):
     """
@@ -154,6 +154,7 @@ def update_user_info(user_id):
     body = json.loads(request.data)
     if None in (body, body.get("weight"), body.get("type")):
         return failure_response("Missing required fields.", 400)
+
     if body.get("type") == "weight":
         user.weight = body.get("weight")
     elif body.get("type") == "height":
