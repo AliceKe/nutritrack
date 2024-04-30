@@ -6,7 +6,6 @@ from datetime import datetime
 db = SQLAlchemy()
 # association tables
 # TBD
-
 # your classes here
 
 

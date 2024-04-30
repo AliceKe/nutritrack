@@ -146,7 +146,7 @@ def get_user_by_id(user_id):
 @app.route("/api/users/<int:user_id>/", methods=["POST"])
 def update_user_info(user_id):
     """
-    Endpoint - Update a user's weight
+    Endpoint - Update a user's weight, height and targets
     """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
