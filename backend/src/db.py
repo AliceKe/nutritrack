@@ -56,6 +56,33 @@ class User(db.Model):
             "foods": [f.serialize() for f in self.foods],
         }
 
+    def get_food_entries_on_date(self, date):
+        """
+        Get all food entries logged on a certain date
+        """
+        return (
+            Food.query.filter(Food.users.contains(self))
+            .filter(Food.timestamp >= datetime.combine(date, datetime.min.time()))
+            .filter(Food.timestamp < datetime.combine(date, datetime.max.time()))
+            .all()
+        )
+
+    def total_calories_eaten_on_date(self, date):
+        """
+        Calculate the total calories eaten on a certain date
+        """
+        food_entries = self.get_food_entries_on_date(date)
+        total_calories = sum(food.calories for food in food_entries)
+        return total_calories
+
+    def remaining_calories_for_day(self, date):
+        """
+        Calculate the remaining calories left for the day
+        """
+        total_calories_eaten = self.total_calories_eaten_on_date(date)
+        remaining_calories = self.daily_calorie_target - total_calories_eaten
+        return remaining_calories if remaining_calories >= 0 else 0
+
 
 class Food(db.Model):
     """
@@ -107,22 +134,3 @@ class Food(db.Model):
             "protein": self.protein,
             "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
         }
-
-    def get_food_entries_on_date(self, date):
-        """
-        Get all food entries logged on a certain date
-        """
-        return (
-            Food.query.filter(Food.users.contains(self))
-            .filter(Food.timestamp >= datetime.combine(date, datetime.min.time()))
-            .filter(Food.timestamp < datetime.combine(date, datetime.max.time()))
-            .all()
-        )
-
-    def total_calories_eaten_on_date(self, date):
-        """
-        Calculate the total calories eaten on a certain date
-        """
-        food_entries = self.get_food_entries_on_date(date)
-        total_calories = sum(food.calories for food in food_entries)
-        return total_calories
