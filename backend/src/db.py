@@ -107,3 +107,22 @@ class Food(db.Model):
             "protein": self.protein,
             "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
         }
+
+    def get_food_entries_on_date(self, date):
+        """
+        Get all food entries logged on a certain date
+        """
+        return (
+            Food.query.filter(Food.users.contains(self))
+            .filter(Food.timestamp >= datetime.combine(date, datetime.min.time()))
+            .filter(Food.timestamp < datetime.combine(date, datetime.max.time()))
+            .all()
+        )
+
+    def total_calories_eaten_on_date(self, date):
+        """
+        Calculate the total calories eaten on a certain date
+        """
+        food_entries = self.get_food_entries_on_date(date)
+        total_calories = sum(food.calories for food in food_entries)
+        return total_calories
