@@ -167,5 +167,33 @@ def update_user_info(user_id):
     return success_response(user.user_serialize())
 
 
+@app.route("/api/users/<int:user_id>/")
+def get_user_daily_intake(user_id):
+    """
+    Endpoint to get the users daily intake
+    """
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found")
+
+    body = json.loads(request.data)
+    date = body.get("date")
+    return user.total_calories_eaten_on_date(date)
+
+
+@app.route("/api/users/<int:user_id>/")
+def find_remaining_calories(user_id):
+    """
+    Endpoint for getting the remaining calorites left
+    """
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found")
+
+    body = json.loads(request.data)
+    date = body.get("date")
+    return user.remaining_calories_for_day(date)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
